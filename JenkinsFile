@@ -2,28 +2,24 @@ pipeline {
     agent any
 
     environment {
-        // 1. Updated to your exact Docker Hub username
-        DOCKER_USER = "meghanagowda282005"
-        
-        // 2. This must match the ID you created in Jenkins Credentials
+        DOCKER_USER = "Janani230904"     // your GitHub/Docker username
         REGISTRY_CREDENTIALS = 'docker-hub-creds'
         
-        IMAGE_NAME = "my_meg_app"
-        CONTAINER_NAME = "my_meg_container"
+        IMAGE_NAME = "my-python-app1"
+        CONTAINER_NAME = "my-python-container"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo '📥 Pulling code from GitHub...'
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Janani230904/my-python-app1.git'
             }
         }
 
         stage('Build') {
             steps {
                 echo '🔨 Building Docker Image...'
-                // Tags the image correctly for your account
                 sh "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:latest ."
             }
         }
@@ -38,7 +34,6 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // This uses the 'docker-hub-creds' from your Jenkins Credentials vault
                     docker.withRegistry('', "${REGISTRY_CREDENTIALS}") {
                         echo '📤 Pushing Image to Docker Hub...'
                         sh "docker push ${DOCKER_USER}/${IMAGE_NAME}:latest"
@@ -62,8 +57,7 @@ pipeline {
             echo '✅ Success! Your image is on Docker Hub and running locally.'
         }
         failure {
-            echo '❌ Pipeline Failed. Check the Console Output for login or naming errors.'
+            echo '❌ Pipeline Failed. Check the Console Output.'
         }
     }
 }
-
